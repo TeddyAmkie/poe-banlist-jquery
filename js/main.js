@@ -1,3 +1,7 @@
+// Code for the functionality on the page. 
+// We're going to create a (class) and populate it with methods of all the page functionality.
+
+// TODO: Turn this into an actual class.
 (function (window) {
 
     let Blocker = {
@@ -21,7 +25,7 @@
             // Get data from chrome storage
             chrome.storage.sync.get(['review-list'], function (reviewList) {
                 let results = reviewList['review-list'] ? reviewList['review-list'] : {};
-                console.log("Storage succesfully receieved: ", results);
+                // console.log("Storage succesfully receieved: ", results);
                 self.reviewList = results;
 
                 // Modify page based on storage data
@@ -77,7 +81,7 @@
             this.usersBlocked.push(user);
             if (this.reviewList[user]) {
                 this.reviewList[user].hidden = true;
-                console.log(this.reviewList);
+                // console.log(this.reviewList);
             }
             else {
                 this.reviewList[user] = {
@@ -160,7 +164,7 @@
             }
         },
         upvoteUserUI: function (user) {
-            console.log("we made it here bud!");
+            // console.log("we made it here bud!");
             if (this.isCurrencyPage) {
                 $('.displayoffer[data-ign="' + user + '"]').children().css('background-color', 'green');
             } else {

@@ -1,3 +1,8 @@
+// Code for the popup window when you click the chrome extension button.
+
+
+// TODO: Turn this into an actual class.
+
 (function (window) {
 
     let BlockerPopUp = {
@@ -11,20 +16,66 @@
             let blockedSellerList = $('.blocked-seller-list');
             let self = this;
 
-            chrome.storage.sync.get(['blocked-sellers'], function (blockedSellers) {
-                let results = blockedSellers['blocked-sellers'] ? blockedSellers['blocked-sellers'] : [];
-                self.sellersBlocked = results;
+            chrome.storage.sync.get(['review-list'], function (reviewList) {
+                let results = reviewList['review-list'] ? reviewList['review-list'] : {};
+                console.log("Popup storage succesfully receieved: ", results);
+                self.reviewList = results;
 
-                $('.no-items').show();
-                if (self.sellersBlocked.length) {
-                    $('.no-items').hide();
-                }
+                for (let seller in self.reviewList) {
+                    let sellerNumber = 0;
 
-                _.each(self.sellersBlocked, function (seller) {
-                    let item = "<li data-ign='" + seller + "'><span class='left'>" + seller + "</span><span class='right'><a href='#' class='remove-seller-from-blacklist'>Remove</a></span></li>";
+                    // Create table row for seller
+                    let item = `
+                    <tr>
+                    <th scope="row">${sellerNumber}</th>
+                    <td>${self.reviewList[seller]['score']}</td>
+                    <td>${seller}</td>`
+                    //Append all reasons as new columns to that seller
+                    for (let reason in self.reviewList[seller]['reason']) {
+                        // if it's the first reason, put it on the same row
+                        if (reason == 0) {
+                            console.log('sup my guy');
+                            item += `
+                        <td> ${self.reviewList[seller]['reason'][reason]} </td>
+                        `
+                        }
+                        // if it's not, 
+                        else {
+                            item += `
+                            <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td> ${self.reviewList[seller]['reason'][reason]} </td>
+                            </tr>`
+                        }
+                    }
+
+                    // Close the table row block
+                    item += `
+                    </tr>`
+                    // Append to table
                     blockedSellerList.append(item);
-                });
+                    sellerNumber++;
+                }
             });
+
+            // Legacy code
+            // chrome.storage.sync.get(['blocked-sellers'], function (blockedSellers) {
+            //     let results = blockedSellers['blocked-sellers'] ? blockedSellers['blocked-sellers'] : [];
+            //     self.sellersBlocked = results;
+
+            //     $('.no-items').show();
+            //     if (self.sellersBlocked.length) {
+            //         $('.no-items').hide();
+            //     }
+
+            //     _.each(self.sellersBlocked, function (seller) {
+            //         let item = "<li data-ign='" + seller + "'><span class='left'>" + seller + "</span><span class='right'><a href='#' class='remove-seller-from-blacklist'>Remove</a></span></li>";
+
+            //         blockedSellerList.append(item);
+            //     });
+            // });
         },
         removeSellerFromList: function (sellerToRemove) {
             this.sellersBlocked = _.filter(this.sellersBlocked, function (seller) { return seller != sellerToRemove; });
@@ -61,10 +112,12 @@
         }
     };
 
+    // Initalize code
     $(document).ready(function () {
 
         BlockerPopUp.init();
 
+        // Highlights the row you click on. TODO: Convert from targeting the list to targeting the table.
         $('ul.tabs li').click(function () {
             let tab_id = $(this).attr('data-tab');
 
@@ -76,6 +129,7 @@
         });
     });
 
+    // Click Handlers
     $(document).on('click', '.remove-seller-from-blacklist', function (e) {
         e.preventDefault();
         let ign = $(this).parents('li').data('ign');

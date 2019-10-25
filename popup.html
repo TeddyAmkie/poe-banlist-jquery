@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Poe.trade ignore list</title>
     <link rel="stylesheet" href="css/popup.css">
 </head>
+
 <body>
     <div class="container">
         <ul class="tabs">
@@ -12,9 +14,21 @@
             <li class="tab" data-tab="tab-2">Mass Add Sellers</li>
         </ul>
         <div id="tab-1" class="tab-content active">
-            <h3>List of blocked poe.trade sellers:</h3>
+            <h3>Table of blocked poe.trade sellers:</h3>
             <p class="no-items">No items</p>
-            <ul class="blocked-seller-list"></ul>
+            <table class="table table-hover table-dark table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Score</th>
+                        <th scope="col">Username</th>
+                        <th scope="col">Reason</th>
+                    </tr>
+                <tbody class="blocked-seller-list">
+                    <!-- CONTENT GOES HERE -->
+                </tbody>
+                </thead>
+            </table>
             <div class="action-container">
                 <a href="#" class="clear-all-users">Revove all from blacklist</a>
             </div>
@@ -31,5 +45,7 @@
     <script src="vendor/jquery-3.0.0.min.js"></script>
     <script src="vendor/underscore-min.js"></script>
     <script src="js/popup.js"></script>
+    
 </body>
+
 </html>
