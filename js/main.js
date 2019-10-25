@@ -1,6 +1,6 @@
 (function (window) {
 
-    var Blocker = {
+    let Blocker = {
         // Initalizers
         isCurrencyPage: false,
         usersBlocked: [],
@@ -11,12 +11,12 @@
             this.allWhispers();
         },
         checkPage: function () {
-            var host = window.location.host;
+            let host = window.location.host;
             this.isCurrencyPage = host.indexOf('currency') > -1
         },
         // Get data from chrome storage and update page accordingly.
         getChromeStorage: function () {
-            // this will get us the window. Using self will make sure we can access methods from this class.
+            // We want to store the Blocker class as this so we don't end up calling methods on the window.
             let self = this;
             // Get data from chrome storage
             chrome.storage.sync.get(['review-list'], function (reviewList) {
@@ -40,7 +40,7 @@
 
 
             // chrome.storage.sync.get(['blocked-sellers'], function (blockedSellers) {
-            //     var results = blockedSellers['blocked-sellers'] ? blockedSellers['blocked-sellers'] : [];
+            //     let results = blockedSellers['blocked-sellers'] ? blockedSellers['blocked-sellers'] : [];
             //     self.usersBlocked = results;
 
             //     _.each(self.usersBlocked, function (seller) {
@@ -51,8 +51,8 @@
 
         // Set-up buttons:
         allWhispers: function () {
-            var self = this;
-            var sellers = this.isCurrencyPage ? $('.displayoffer-bottom span.right a') : $('.whisper-btn');
+            let self = this;
+            let sellers = this.isCurrencyPage ? $('.displayoffer-bottom span.right a') : $('.whisper-btn');
 
             _.each(sellers, function (seller) {
                 self.appendButtons(seller);
@@ -86,7 +86,7 @@
                 }
             }
 
-            var object = {};
+            let object = {};
             // object['blocked-sellers'] = this.usersBlocked;
             object['review-list'] = this.reviewList;
             chrome.storage.sync.set(object);
@@ -113,11 +113,13 @@
                 seller.reason = [];
                 seller.reason.push(reason);
             }
+            if (this.reviewList[user].score > 0) {
+                this.upvoteUserUI(user);
+            }
             // Chrome extension puts in the value. Create an object to properly format
             let object = {};
             object['review-list'] = this.reviewList;
             chrome.storage.sync.set(object);
-            this.upvoteUserUI(user);
         },
 
         downvoteUser: function (user, reason) {
@@ -140,11 +142,13 @@
                 seller.reason = [];
                 seller.reason.push(reason);
             }
+            if (this.reviewList[user].score < 0) {
+                this.downvoteUserUI(user);
+            }
             // Chrome extension puts in the value. Create an object to properly format
             let object = {};
             object['review-list'] = this.reviewList;
             chrome.storage.sync.set(object);
-            this.downvoteUserUI(user);
         },
 
         // UI methods
@@ -175,7 +179,7 @@
     // Hide user click handler
     $(document).on('click', '.hide-seller', function (e) {
         e.preventDefault();
-        var ign = Blocker.isCurrencyPage ? $(this).parents('.displayoffer').data('ign') : $(this).parents('tbody').data('ign');
+        let ign = Blocker.isCurrencyPage ? $(this).parents('.displayoffer').data('ign') : $(this).parents('tbody').data('ign');
 
         if (ign) {
             if (confirm('Block this seller?')) {
@@ -187,7 +191,7 @@
     // Upvote user click handler
     $(document).on('click', '.upvote-seller', function (e) {
         e.preventDefault();
-        var ign = Blocker.isCurrencyPage ? $(this).parents('.displayoffer').data('ign') : $(this).parents('tbody').data('ign');
+        let ign = Blocker.isCurrencyPage ? $(this).parents('.displayoffer').data('ign') : $(this).parents('tbody').data('ign');
 
         if (ign) {
             let reason = prompt('Want to leave a reason why you enjoyed trading with this user?')
@@ -198,7 +202,7 @@
     // downvote user click handler
     $(document).on('click', '.downvote-seller', function (e) {
         e.preventDefault();
-        var ign = Blocker.isCurrencyPage ? $(this).parents('.displayoffer').data('ign') : $(this).parents('tbody').data('ign');
+        let ign = Blocker.isCurrencyPage ? $(this).parents('.displayoffer').data('ign') : $(this).parents('tbody').data('ign');
 
         if (ign) {
             let reason = prompt("What'd they do wrong this time");
