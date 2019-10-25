@@ -7,24 +7,46 @@
         reviewList: {},
         init: function () {
             this.checkPage()
-            this.hideBlockedUsers();
+            this.getChromeStorage();
             this.allWhispers();
         },
         checkPage: function () {
             var host = window.location.host;
             this.isCurrencyPage = host.indexOf('currency') > -1
         },
-        hideBlockedUsers: function () {
-            var self = this;
+        // Get data from chrome storage and update page accordingly.
+        getChromeStorage: function () {
+            // this will get us the window. Using self will make sure we can access methods from this class.
+            let self = this;
+            // Get data from chrome storage
+            chrome.storage.sync.get(['review-list'], function (reviewList) {
+                let results = reviewList['review-list'] ? reviewList['review-list'] : {};
+                console.log("Storage succesfully receieved: ", results);
+                self.reviewList = results;
 
-            chrome.storage.sync.get(['blocked-sellers'], function (blockedSellers) {
-                var results = blockedSellers['blocked-sellers'] ? blockedSellers['blocked-sellers'] : [];
-                self.usersBlocked = results;
-
-                _.each(self.usersBlocked, function (seller) {
-                    self.hideUser(seller);
-                });
+                // Modify page based on storage data
+                for (let user in self.reviewList) {
+                    if (self.reviewList[user].score > 0) {
+                        self.upvoteUserUI(user);
+                    }
+                    if (self.reviewList[user].score < 0) {
+                        self.downvoteUser(user);
+                    }
+                    if (self.reviewList[user].hidden) {
+                        self.hideUser(user);
+                    }
+                }
             });
+
+
+            // chrome.storage.sync.get(['blocked-sellers'], function (blockedSellers) {
+            //     var results = blockedSellers['blocked-sellers'] ? blockedSellers['blocked-sellers'] : [];
+            //     self.usersBlocked = results;
+
+            //     _.each(self.usersBlocked, function (seller) {
+            //         self.hideUser(seller);
+            //     });
+            // });
         },
 
         // Set-up buttons:
@@ -53,11 +75,21 @@
         // Button click handler actions
         hideUser: function (user) {
             this.usersBlocked.push(user);
+            if (this.reviewList[user]) {
+                this.reviewList[user].hidden = true;
+                console.log(this.reviewList);
+            }
+            else {
+                this.reviewList[user] = {
+                    score: 0,
+                    hidden: true
+                }
+            }
 
-            var jsonObj = {};
-            jsonObj['blocked-sellers'] = this.usersBlocked;
-
-            chrome.storage.sync.set(jsonObj);
+            var object = {};
+            // object['blocked-sellers'] = this.usersBlocked;
+            object['review-list'] = this.reviewList;
+            chrome.storage.sync.set(object);
             this.hideUserUI(user);
         },
 
@@ -75,13 +107,16 @@
             else {
                 this.reviewList[user] = {
                     score: 1,
+                    hidden: false
                 }
                 let seller = this.reviewList[user];
                 seller.reason = [];
                 seller.reason.push(reason);
             }
-            console.log("review list is: ", this.reviewList)
-            chrome.storage.sync.set(this.reviewList);
+            // Chrome extension puts in the value. Create an object to properly format
+            let object = {};
+            object['review-list'] = this.reviewList;
+            chrome.storage.sync.set(object);
             this.upvoteUserUI(user);
         },
 
@@ -99,11 +134,16 @@
             else {
                 this.reviewList[user] = {
                     score: -1,
+                    hidden: false
                 }
                 let seller = this.reviewList[user];
                 seller.reason = [];
                 seller.reason.push(reason);
             }
+            // Chrome extension puts in the value. Create an object to properly format
+            let object = {};
+            object['review-list'] = this.reviewList;
+            chrome.storage.sync.set(object);
             this.downvoteUserUI(user);
         },
 
@@ -116,6 +156,7 @@
             }
         },
         upvoteUserUI: function (user) {
+            console.log("we made it here bud!");
             if (this.isCurrencyPage) {
                 $('.displayoffer[data-ign="' + user + '"]').children().css('background-color', 'green');
             } else {
