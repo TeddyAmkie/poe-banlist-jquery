@@ -34,10 +34,10 @@
                         self.upvoteUserUI(user);
                     }
                     if (self.reviewList[user].score < 0) {
-                        self.downvoteUser(user);
+                        self.downvoteUserUI(user);
                     }
                     if (self.reviewList[user].hidden) {
-                        self.hideUser(user);
+                        self.hideUserUI(user);
                     }
                 }
             });
