@@ -1,23 +1,32 @@
 {
   "manifest_version": 2,
-
-  "name": "Poe.trade ignore list",
-  "description": "This extension allows you to blacklist and manage sellers from poe.trade",
-  "version": "0.1",
-
+  "name": "Poe.trade Review List(beta)",
+  "description": "Poe.trade banlist. For more information: https://github.com/TeddyAmkie/poe-banlist-jquery ",
+  "version": "0.0.0.1",
   "permissions": [
     "storage"
   ],
-
-  "content_scripts": [ {
-    "js": [ "vendor/jquery-3.0.0.min.js", "vendor/underscore-min.js", "js/main.js" ],
-    "css": [ "css/main.css" ],
-    "matches": [ "http://*.poe.trade/*"]
-  }],
-
+  "content_scripts": [
+    {
+      "js": [
+        "vendor/jquery-3.0.0.min.js",
+        "vendor/underscore-min.js",
+        "js/main.js",
+        "js/popup.js"
+      ],
+      "css": [
+        "css/main.css"
+      ],
+      "matches": [
+        "http://*.poe.trade/*"
+      ]
+    }
+  ],
   "browser_action": {
     "default_popup": "popup.html"
   },
-
-  "icons": {"48": "images/poeBlock.png", "128": "images/poeBlock_large.png" }
+  "icons": {
+    "48": "images/poeBlock.png",
+    "128": "images/poeBlock_large.png"
+  }
 }
